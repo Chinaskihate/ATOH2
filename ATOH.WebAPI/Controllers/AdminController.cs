@@ -4,7 +4,6 @@ using ATOH.Application.Users.ChangePassword;
 using ATOH.Application.Users.CreateUser;
 using ATOH.Application.Users.UpdateUser;
 using ATOH.Domain.Models;
-using ATOH.WebAPI.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -146,5 +145,40 @@ public class AdminController : Controller
     public async Task<ActionResult<IEnumerable<User>>> GetOlderThan(int years)
     {
         return Ok(await _userManager.GetOlderThan(years));
+    }
+
+    [HttpDelete("DeleteUser")]
+    public async Task<ActionResult> DeleteUser(string userName, bool isSoft)
+    {
+        var user = await _userManager.FindByNameAsync(userName);
+        if (user == null)
+        {
+            return NotFound(user);
+        }
+
+        if (isSoft)
+        {
+            user.RevokedOn = DateTime.Now;
+            user.RevokedBy = User.Identity.Name;
+            var result = await _userManager.UpdateAsync(user);
+            return Ok(result);
+        }
+
+        return Ok(await _userManager.DeleteAsync(user));
+    }
+
+    [HttpPost("RecoverUser")]
+    public async Task<ActionResult> RecoverUser(string userName)
+    {
+        var user = await _userManager.FindByNameAsync(userName);
+        if (user == null)
+        {
+            return NotFound(user);
+        }
+
+        user.RevokedOn = null;
+        user.RevokedBy = null;
+        var result = await _userManager.UpdateAsync(user);
+        return Ok(result);
     }
 }
