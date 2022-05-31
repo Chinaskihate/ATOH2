@@ -1,9 +1,10 @@
 using System.Reflection;
 using System.Text;
+using ATOH.Persistence;
 using ATOH.WebAPI;
 using ATOH.WebAPI.Options;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -14,10 +15,28 @@ RegisterServices(builder.Services, builder.Configuration);
 var app = builder.Build();
 Configure(app, app.Environment);
 
+using (var scope = app.Services.CreateScope())
+{
+    var serviceProvider = scope.ServiceProvider;
+    try
+    {
+        var factory = serviceProvider.GetRequiredService<IDbContextFactory<AppDbContext>>();
+        DbInitializer.Initialize(factory);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine();
+        Console.WriteLine($"Error in db creating! {ex.Message}");
+        return;
+    }
+}
+
 app.Run();
 
 void RegisterServices(IServiceCollection services, IConfiguration config)
 {
+    services.AddPersistence(config["DbConnection"]);
+
     services.AddEndpointsApiExplorer();
     services.AddAuthentication("OAuth")
         .AddJwtBearer("OAuth", config =>
@@ -25,7 +44,7 @@ void RegisterServices(IServiceCollection services, IConfiguration config)
             var secretBytes = Encoding.UTF8.GetBytes(Constants.Secret);
             var key = new SymmetricSecurityKey(secretBytes);
 
-            config.Events = new JwtBearerEvents()
+            config.Events = new JwtBearerEvents
             {
                 OnMessageReceived = context =>
                 {
@@ -38,7 +57,7 @@ void RegisterServices(IServiceCollection services, IConfiguration config)
                 }
             };
 
-            config.TokenValidationParameters = new TokenValidationParameters()
+            config.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidIssuer = Constants.Issuer,
                 ValidAudience = Constants.Audience,

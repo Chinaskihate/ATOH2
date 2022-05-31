@@ -22,7 +22,7 @@ public class User : IdentityUser<Guid>
 
     public DateTime? RevokedOn { get; set; }
 
-    public string RevokedBy { get; set; }
+    public string? RevokedBy { get; set; }
 }
 
 public enum Gender
