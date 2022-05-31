@@ -1,5 +1,6 @@
 ﻿using ATOH.Application.Interfaces.AdminService;
 using ATOH.Application.Users.CreateUser;
+using ATOH.Application.Users.UpdateUser;
 using ATOH.Domain.Models;
 using ATOH.WebAPI.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -11,7 +12,7 @@ namespace ATOH.WebAPI.Controllers;
 [ApiController]
 [ApiVersionNeutral]
 [Route("api/Admin")]
-[Authorize]
+[Authorize(Roles = "Admin")]
 public class AdminController : Controller
 {
     private readonly IAdminService _adminService;
@@ -30,35 +31,7 @@ public class AdminController : Controller
         _adminService = adminService;
     }
 
-    [HttpPost("Login")]
-    [AllowAnonymous]
-    public async Task<ActionResult> Login(LoginViewModel viewModel)
-    {
-        var user = await _userManager.FindByNameAsync(viewModel.UserName);
-        if (user == null)
-        {
-            return NotFound("Invalid data.");
-        }
-
-        var result = await _signInManager.PasswordSignInAsync(viewModel.UserName, viewModel.Password, false, false);
-        if (result.Succeeded)
-        {
-            return Ok("ok");
-        }
-
-        return NotFound("Invalid data.");
-    }
-
-    [HttpGet("Temp")]
-    [Authorize(Roles = "Admin")]
-    public async Task<ActionResult> Temp()
-    {
-        var temp = User.Identity.Name;
-        return Ok("132231231231");
-    }
-
     [HttpPost("CreateUser")]
-    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> CreateUser([FromBody] CreateUserDto dto)
     {
         var createdBy = User.Identity.Name;
@@ -66,6 +39,19 @@ public class AdminController : Controller
         if (result.Succeeded)
         {
             return Ok(result);
+        }
+
+        return BadRequest(result);
+    }
+
+    [HttpPost("UpdateUser")]
+    public async Task<ActionResult> UpdateUser([FromBody] UpdateUserDto dto)
+    {
+        var userName = User.Identity.Name;
+        var result = await _adminService.UpdateUser(dto, userName);
+        if (result.Succeeded)
+        {
+            return Ok();
         }
 
         return BadRequest(result);

@@ -1,9 +1,7 @@
-﻿using ATOH.Application.Users.UpdateUser;
-using Microsoft.AspNetCore.Identity;
+﻿using ATOH.Application.Interfaces.UserUpdaterServices;
 
 namespace ATOH.Application.Interfaces.UserServices;
 
-public interface IUserService
+public interface IUserService : IUserUpdater
 {
-    Task<IdentityResult> UpdateUser(UpdateUserDto dto, string modifiedBy);
 }

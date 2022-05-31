@@ -1,5 +1,6 @@
 ﻿using ATOH.Application.Interfaces.AdminService;
 using ATOH.Application.Users.CreateUser;
+using ATOH.Application.Users.UpdateUser;
 using ATOH.Domain.Models;
 using Microsoft.AspNetCore.Identity;
 
@@ -38,5 +39,28 @@ public class AdminService : IAdminService
             await _userManager.AddToRoleAsync(createdUser, "Admin");
         }
         return result;
+    }
+
+    public async Task<IdentityResult> UpdateUser(UpdateUserDto dto, string modifiedBy)
+    {
+        if (string.IsNullOrEmpty(dto.Name))
+        {
+            return IdentityResult.Failed();
+        }
+
+        if (dto.BirthDay > DateTime.Now)
+        {
+            return IdentityResult.Failed();
+        }
+
+        var user = await _userManager.FindByNameAsync(dto.UserName);
+        
+        user.Name = dto.Name;
+        user.BirthDay = dto.BirthDay;
+        user.Gender = dto.Gender;
+        user.ModifiedOn = DateTime.Now;
+        user.ModifiedBy = modifiedBy;
+
+        return await _userManager.UpdateAsync(user);
     }
 }

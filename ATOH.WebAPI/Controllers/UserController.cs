@@ -10,7 +10,7 @@ namespace ATOH.WebAPI.Controllers;
 
 [ApiController]
 [ApiVersionNeutral]
-[Route("api/Admin")]
+[Route("api/User")]
 [Authorize]
 public class UserController : Controller
 {
