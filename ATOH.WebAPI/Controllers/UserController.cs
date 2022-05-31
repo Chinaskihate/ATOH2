@@ -1,5 +1,6 @@
 ﻿using ATOH.Application.Interfaces.AdminService;
 using ATOH.Application.Interfaces.UserServices;
+using ATOH.Application.Users.ChangePassword;
 using ATOH.Application.Users.UpdateUser;
 using ATOH.Domain.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -41,5 +42,20 @@ public class UserController : Controller
         }
 
         return BadRequest(result);
+    }
+
+    [HttpPost("ChangePassword")]
+    public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordByUserDto byUserDto)
+    {
+        var user = await _userManager.FindByNameAsync(User.Identity.Name);
+        var result = await _userManager.ChangePasswordAsync(user, byUserDto.OldPassword, byUserDto.NewPassword);
+        if (result.Succeeded)
+        {
+            user.ModifiedBy = user.UserName;
+            user.ModifiedOn = DateTime.Now;
+            return Ok();
+        }
+
+        return BadRequest();
     }
 }

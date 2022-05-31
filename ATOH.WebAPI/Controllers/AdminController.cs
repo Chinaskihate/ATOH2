@@ -1,4 +1,5 @@
 ﻿using ATOH.Application.Interfaces.AdminService;
+using ATOH.Application.Users.ChangePassword;
 using ATOH.Application.Users.CreateUser;
 using ATOH.Application.Users.UpdateUser;
 using ATOH.Domain.Models;
@@ -84,5 +85,21 @@ public class AdminController : Controller
         }
 
         return Ok(result);
+    }
+
+    [HttpPost("ChangePassword")]
+    public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordByAdminDto dto)
+    {
+        var user = await _userManager.FindByNameAsync(dto.UserName);
+        await _userManager.RemovePasswordAsync(user);
+        var result = await _userManager.AddPasswordAsync(user, dto.NewPassword);
+        if (result.Succeeded)
+        {
+            user.ModifiedBy = User.Identity.Name;
+            user.ModifiedOn = DateTime.Now;
+            return Ok();
+        }
+
+        return BadRequest();
     }
 }

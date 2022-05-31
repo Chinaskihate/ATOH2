@@ -11,7 +11,7 @@ namespace ATOH.WebAPI.Controllers;
 [ApiController]
 [ApiVersionNeutral]
 [Route("api/Auth")]
-// [Authorize]
+[Authorize]
 public class AuthController : Controller
 {
     private readonly SignInManager<User> _signInManager;
@@ -25,7 +25,7 @@ public class AuthController : Controller
     }
 
     [HttpPost("Login")]
-    // [AllowAnonymous]
+    [AllowAnonymous]
     public async Task<ActionResult> Login(LoginViewModel viewModel)
     {
         var user = await _userManager.FindByNameAsync(viewModel.UserName);
