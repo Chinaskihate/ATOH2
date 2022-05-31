@@ -58,4 +58,24 @@ public class UserController : Controller
 
         return BadRequest();
     }
+
+    [HttpPost("ChangeUserName")]
+    public async Task<ActionResult> ChangeUserName(string newUserName)
+    {
+        var user = await _userManager.FindByNameAsync(User.Identity.Name);
+        if (user.RevokedOn == null)
+        {
+            return Forbid();
+        }
+        user.UserName = newUserName;
+        var result = await _userManager.UpdateAsync(user);
+        if (result.Succeeded)
+        {
+            user.ModifiedBy = user.UserName;
+            user.ModifiedOn = DateTime.Now;
+            return Ok(newUserName);
+        }
+
+        return BadRequest("Username already exists");
+    }
 }

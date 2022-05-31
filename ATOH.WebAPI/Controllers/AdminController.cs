@@ -102,4 +102,20 @@ public class AdminController : Controller
 
         return BadRequest();
     }
+
+    [HttpPost("ChangeUserName")]
+    public async Task<ActionResult> ChangeUserName(string oldUserName, string newUserName)
+    {
+        var user = await _userManager.FindByNameAsync(oldUserName);
+        user.UserName = newUserName;
+        var result = await _userManager.UpdateAsync(user);
+        if (result.Succeeded)
+        {
+            user.ModifiedBy = User.Identity.Name;
+            user.ModifiedOn = DateTime.Now;
+            return Ok(newUserName);
+        }
+
+        return BadRequest("Username already exists");
+    }
 }
