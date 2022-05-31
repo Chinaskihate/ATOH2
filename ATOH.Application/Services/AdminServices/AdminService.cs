@@ -3,7 +3,7 @@ using ATOH.Application.Users.CreateUser;
 using ATOH.Domain.Models;
 using Microsoft.AspNetCore.Identity;
 
-namespace ATOH.Application.Services.AdminService;
+namespace ATOH.Application.Services.AdminServices;
 
 public class AdminService : IAdminService
 {
