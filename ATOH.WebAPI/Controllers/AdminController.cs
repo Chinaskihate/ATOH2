@@ -1,4 +1,5 @@
-﻿using ATOH.Application.Interfaces.AdminService;
+﻿using ATOH.Application.Extensions;
+using ATOH.Application.Interfaces.AdminService;
 using ATOH.Application.Users.ChangePassword;
 using ATOH.Application.Users.CreateUser;
 using ATOH.Application.Users.UpdateUser;
@@ -117,5 +118,27 @@ public class AdminController : Controller
         }
 
         return BadRequest("Username already exists");
+    }
+
+    [HttpGet("GetActiveUsers")]
+    public async Task<ActionResult<IEnumerable<User>>> GetActiveUsers()
+    {
+        return Ok(await _userManager.GetActiveUsers());
+    }
+
+    [HttpGet("GetUser")]
+    public async Task<ActionResult<User>> GetUser(string userName)
+    {
+        var user = await _userManager.FindByNameAsync(userName);
+        if (user == null)
+        {
+            return NotFound(userName);
+        }
+
+        return Ok(new
+        {
+            name = user.Name, gender = user.Gender, birthDay = user.BirthDay,
+            isActive = user.RevokedOn == null
+        });
     }
 }
