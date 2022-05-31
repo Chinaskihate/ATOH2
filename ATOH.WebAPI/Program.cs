@@ -3,6 +3,7 @@ using System.Text;
 using ATOH.WebAPI;
 using ATOH.WebAPI.Options;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -23,6 +24,19 @@ void RegisterServices(IServiceCollection services, IConfiguration config)
         {
             var secretBytes = Encoding.UTF8.GetBytes(Constants.Secret);
             var key = new SymmetricSecurityKey(secretBytes);
+
+            config.Events = new JwtBearerEvents()
+            {
+                OnMessageReceived = context =>
+                {
+                    if (context.Request.Query.ContainsKey("access_token"))
+                    {
+                        context.Token = context.Request.Query["access_token"];
+                    }
+
+                    return Task.CompletedTask;
+                }
+            };
 
             config.TokenValidationParameters = new TokenValidationParameters()
             {
