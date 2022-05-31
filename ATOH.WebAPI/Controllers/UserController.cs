@@ -1,7 +1,10 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using ATOH.Domain.Models;
+using ATOH.WebAPI.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
@@ -14,36 +17,69 @@ namespace ATOH.WebAPI.Controllers;
 [Authorize]
 public class UserController : Controller
 {
-    [HttpGet("Auth")]
-    [AllowAnonymous]
-    public async Task<ActionResult> Authenticate()
+    private readonly SignInManager<User> _signInManager;
+    private readonly UserManager<User> _userManager;
+    private readonly RoleManager<IdentityRole<Guid>> _roleManager;
+
+    public UserController(SignInManager<User> signInManager, UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager)
     {
-        var claims = new[]
+        _signInManager = signInManager;
+        _userManager = userManager;
+        _roleManager = roleManager;
+    }
+
+    [HttpPost("Login")]
+    [AllowAnonymous]
+    public async Task<ActionResult> Login(LoginViewModel viewModel)
+    {
+        var user = await _userManager.FindByNameAsync(viewModel.UserName);
+        if (user == null)
         {
-            new Claim(JwtRegisteredClaimNames.Sub, "id"),
-            new Claim(JwtRegisteredClaimNames.Name, "some name")
-        };
+            return NotFound($"Invalid data.");
+        }
 
-        var secretBytes = Encoding.UTF8.GetBytes(Constants.Secret);
-        var key = new SymmetricSecurityKey(secretBytes);
-        var algorithm = SecurityAlgorithms.HmacSha256;
-        var signingCredentials = new SigningCredentials(key, algorithm);
+        var result = await _signInManager.PasswordSignInAsync(viewModel.UserName, viewModel.Password, false, false);
+        if (result.Succeeded)
+        {
+            return Ok("ok");
+        }
 
-        var token = new JwtSecurityToken(
-            Constants.Issuer,
-            Constants.Audience,
-            claims,
-            DateTime.Now,
-            DateTime.Now.AddHours(1),
-            signingCredentials);
-
-        var tokenJson = new JwtSecurityTokenHandler().WriteToken(token);
-        return Ok(new { access_token = tokenJson });
+        return NotFound($"Invalid data.");
     }
 
     [HttpGet("Temp")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> Temp()
     {
+        var temp = User.Identity.Name;
         return Ok("132231231231");
+    }
+
+    [HttpGet("CreateAdmin")]
+    [AllowAnonymous]
+    public async Task<ActionResult> CreateAdmin()
+    {
+        await _roleManager.CreateAsync(new IdentityRole<Guid>("Admin"));
+        await _roleManager.CreateAsync(new IdentityRole<Guid>("User"));
+        var user = new User()
+        {
+            Id = Guid.NewGuid(),
+            UserName = "Admin",
+            IsAdmin = true,
+            BirthDay = DateTime.Now,
+            CreatedBy = "DbInitializer",
+            CreatedOn = DateTime.Now,
+            Gender = Gender.Other,
+            Name = "Admin",
+            ModifiedBy = "DbInitializer",
+            ModifiedOn = DateTime.Now
+        };
+        var result = await _userManager.CreateAsync(user, "1234");
+        if (user.IsAdmin)
+        {
+            var createdUser = await _userManager.FindByNameAsync(user.UserName);
+            var temp3= await _userManager.AddToRoleAsync(user, "Admin");
+        }
+        return Ok(result);
     }
 }

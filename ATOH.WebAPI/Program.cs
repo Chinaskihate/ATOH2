@@ -1,9 +1,11 @@
 using System.Reflection;
 using System.Text;
+using ATOH.Domain.Models;
 using ATOH.Persistence;
 using ATOH.WebAPI;
 using ATOH.WebAPI.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -36,6 +38,25 @@ app.Run();
 void RegisterServices(IServiceCollection services, IConfiguration config)
 {
     services.AddPersistence(config["DbConnection"]);
+
+    services.AddIdentity<User, IdentityRole<Guid>>(config =>
+    {
+        config.Password.RequireDigit = false;
+        config.Password.RequireLowercase = false;
+        config.Password.RequireNonAlphanumeric = false;
+        config.Password.RequireUppercase = false;
+        config.Password.RequiredLength = 4;
+    })
+        .AddEntityFrameworkStores<AppDbContext>()
+        .AddDefaultTokenProviders();
+
+    services.AddIdentityServer()
+        .AddAspNetIdentity<User>()
+        .AddInMemoryApiResources(IdentityConfiguration.ApiResources)
+        .AddInMemoryIdentityResources(IdentityConfiguration.IdentityResources)
+        .AddInMemoryApiScopes(IdentityConfiguration.ApiScopes)
+        .AddInMemoryClients(IdentityConfiguration.Clients)
+        .AddDeveloperSigningCredential();
 
     services.AddEndpointsApiExplorer();
     services.AddAuthentication("OAuth")
@@ -77,9 +98,6 @@ void RegisterServices(IServiceCollection services, IConfiguration config)
         c.IncludeXmlComments(xmlPath);
     });
     services.AddApiVersioning();
-
-    //services.AddAuthentication("BasicAuthentication")
-    //    .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
 }
 
 void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -94,6 +112,7 @@ void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     app.UseHttpsRedirection();
 
     app.UseRouting();
+    app.UseIdentityServer();
     app.UseAuthentication();
     app.UseAuthorization();
 
