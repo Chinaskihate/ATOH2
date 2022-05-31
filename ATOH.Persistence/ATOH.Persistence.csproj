@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ATOH.Application\ATOH.Application.csproj" />
     <ProjectReference Include="..\ATOH.Domain\ATOH.Domain.csproj" />
   </ItemGroup>
 

@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32421.90
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ATOH.WebAPI", "ATOH.WebAPI\ATOH.WebAPI.csproj", "{D1782842-63C1-456D-90F4-33ED905C0522}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ATOH.WebAPI", "ATOH.WebAPI\ATOH.WebAPI.csproj", "{D1782842-63C1-456D-90F4-33ED905C0522}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ATOH.Domain", "ATOH.Domain\ATOH.Domain.csproj", "{A4B2C233-9F7A-4A4B-8565-F5C0D870BFA0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ATOH.Domain", "ATOH.Domain\ATOH.Domain.csproj", "{A4B2C233-9F7A-4A4B-8565-F5C0D870BFA0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ATOH.Persistence", "ATOH.Persistence\ATOH.Persistence.csproj", "{CEE00263-0181-46AD-93BF-EBAD59E491E8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ATOH.Persistence", "ATOH.Persistence\ATOH.Persistence.csproj", "{CEE00263-0181-46AD-93BF-EBAD59E491E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ATOH.Application", "ATOH.Application\ATOH.Application.csproj", "{7BAA8A1F-AF56-4991-B88E-A1A44466B6E5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{CEE00263-0181-46AD-93BF-EBAD59E491E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CEE00263-0181-46AD-93BF-EBAD59E491E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CEE00263-0181-46AD-93BF-EBAD59E491E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BAA8A1F-AF56-4991-B88E-A1A44466B6E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BAA8A1F-AF56-4991-B88E-A1A44466B6E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BAA8A1F-AF56-4991-B88E-A1A44466B6E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BAA8A1F-AF56-4991-B88E-A1A44466B6E5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

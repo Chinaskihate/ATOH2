@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Text;
+using ATOH.Application;
 using ATOH.Domain.Models;
 using ATOH.Persistence;
 using ATOH.WebAPI;
@@ -37,6 +38,7 @@ app.Run();
 
 void RegisterServices(IServiceCollection services, IConfiguration config)
 {
+    services.AddApplication();
     services.AddPersistence(config["DbConnection"]);
 
     services.AddIdentity<User, IdentityRole<Guid>>(config =>
