@@ -12,4 +12,12 @@ public static class UserManagerExtension
             .OrderBy(u => u.CreatedOn)
             .ToListAsync();
     }
+
+    public static async Task<IEnumerable<User>> GetOlderThan(this UserManager<User> userManager, int years)
+    {
+        return (await userManager.Users
+            .ToListAsync())
+            .Where(u => (DateTime.Now - u.BirthDay).Value.Days > years * 365)
+            .OrderBy(u => u.BirthDay);
+    }
 }

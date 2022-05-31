@@ -141,4 +141,10 @@ public class AdminController : Controller
             isActive = user.RevokedOn == null
         });
     }
+
+    [HttpGet("GetOlderThan")]
+    public async Task<ActionResult<IEnumerable<User>>> GetOlderThan(int years)
+    {
+        return Ok(await _userManager.GetOlderThan(years));
+    }
 }
