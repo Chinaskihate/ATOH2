@@ -4,6 +4,7 @@ using ATOH.Application;
 using ATOH.Domain.Models;
 using ATOH.Persistence;
 using ATOH.WebAPI;
+using ATOH.WebAPI.Middleware;
 using ATOH.WebAPI.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -111,6 +112,7 @@ void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         app.UseSwaggerUI(c => app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ATOH v1")));
     }
 
+    app.UseCustomExceptionHandler();
     app.UseHttpsRedirection();
 
     app.UseRouting();

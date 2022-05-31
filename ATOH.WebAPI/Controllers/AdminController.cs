@@ -18,7 +18,6 @@ public class AdminController : Controller
 {
     private readonly IAdminService _adminService;
     private readonly RoleManager<IdentityRole<Guid>> _roleManager;
-    private readonly SignInManager<User> _signInManager;
     private readonly UserManager<User> _userManager;
 
     public AdminController(SignInManager<User> signInManager,
@@ -26,7 +25,6 @@ public class AdminController : Controller
         RoleManager<IdentityRole<Guid>> roleManager,
         IAdminService adminService)
     {
-        _signInManager = signInManager;
         _userManager = userManager;
         _roleManager = roleManager;
         _adminService = adminService;

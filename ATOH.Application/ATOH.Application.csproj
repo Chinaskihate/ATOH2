@@ -10,4 +10,8 @@
     <ProjectReference Include="..\ATOH.Domain\ATOH.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Common\Exceptions\" />
+  </ItemGroup>
+
 </Project>

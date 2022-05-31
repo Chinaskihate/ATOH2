@@ -19,6 +19,16 @@ public class AdminService : IAdminService
 
     public async Task<IdentityResult> CreateUser(CreateUserDto dto, string createdBy)
     {
+        var result = new IdentityResult();
+        if (string.IsNullOrEmpty(dto.UserName))
+        {
+            result = IdentityResult.Failed(new IdentityError()
+            {
+                Code = "0001",
+                Description = "UserName can't be null or empty"
+            });
+            return result;
+        }
         var user = new User()
         {
             Id = Guid.NewGuid(),
@@ -32,7 +42,7 @@ public class AdminService : IAdminService
             ModifiedBy = createdBy,
             ModifiedOn = DateTime.Now
         };
-        var result = await _userManager.CreateAsync(user, dto.Password);
+        result = await _userManager.CreateAsync(user, dto.Password);
         if (user.IsAdmin)
         {
             var createdUser = await _userManager.FindByNameAsync(user.UserName);
@@ -63,4 +73,6 @@ public class AdminService : IAdminService
 
         return await _userManager.UpdateAsync(user);
     }
+
+    private IdentityResult ValidateUpdateUserDto()
 }
