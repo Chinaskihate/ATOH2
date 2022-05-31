@@ -78,4 +78,18 @@ public class UserController : Controller
 
         return BadRequest("Username already exists");
     }
+
+    [HttpPost("GetData")]
+    public async Task<ActionResult> GetData()
+    {
+        var user = await _userManager.FindByNameAsync(User.Identity.Name);
+        
+        return Ok(new
+        {
+            name = user.Name,
+            gender = user.Gender,
+            birthDay = user.BirthDay,
+            isActive = user.RevokedOn == null
+        });
+    }
 }
