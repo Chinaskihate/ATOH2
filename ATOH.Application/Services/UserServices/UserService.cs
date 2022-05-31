@@ -1,4 +1,4 @@
-﻿using ATOH.Application.Extensions;
+﻿using ATOH.Application.Common.Validators;
 using ATOH.Application.Interfaces.UserServices;
 using ATOH.Application.Users.UpdateUser;
 using ATOH.Domain.Models;
@@ -17,21 +17,11 @@ public class UserService : IUserService
 
     public async Task<IdentityResult> UpdateUser(UpdateUserDto dto, string modifiedBy)
     {
-        if (string.IsNullOrEmpty(dto.Name))
-        {
-            return IdentityResult.Failed();
-        }
-
-        if (dto.BirthDay > DateTime.Now)
-        {
-            return IdentityResult.Failed();
-        }
+        UserParamsValidator.CheckName(dto.Name);
+        UserParamsValidator.CheckBirthday(dto.BirthDay);
 
         var user = await _userManager.FindByNameAsync(dto.UserName);
-        if (user.RevokedOn != null)
-        {
-            return IdentityResult.Failed();
-        }
+        UserParamsValidator.CheckIsRevoked(user.UserName, user.RevokedOn);
 
         user.Name = dto.Name;
         user.BirthDay = dto.BirthDay;

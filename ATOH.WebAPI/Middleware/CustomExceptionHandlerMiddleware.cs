@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Text.Json;
+using ATOH.Application.Common.Exceptions;
 
 namespace ATOH.WebAPI.Middleware;
 
@@ -32,6 +33,9 @@ public class CustomExceptionHandlerMiddleware
         {
             case ArgumentException argumentException:
                 code = HttpStatusCode.BadRequest;
+                break;
+            case RevokedUserException revokedUserException:
+                code = HttpStatusCode.Forbidden;
                 break;
         }
 

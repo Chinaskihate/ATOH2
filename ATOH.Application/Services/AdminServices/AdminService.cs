@@ -1,4 +1,5 @@
-﻿using ATOH.Application.Interfaces.AdminService;
+﻿using ATOH.Application.Common.Validators;
+using ATOH.Application.Interfaces.AdminService;
 using ATOH.Application.Users.CreateUser;
 using ATOH.Application.Users.UpdateUser;
 using ATOH.Domain.Models;
@@ -19,16 +20,10 @@ public class AdminService : IAdminService
 
     public async Task<IdentityResult> CreateUser(CreateUserDto dto, string createdBy)
     {
-        var result = new IdentityResult();
-        if (string.IsNullOrEmpty(dto.UserName))
-        {
-            result = IdentityResult.Failed(new IdentityError()
-            {
-                Code = "0001",
-                Description = "UserName can't be null or empty"
-            });
-            return result;
-        }
+        UserParamsValidator.CheckUserName(dto.UserName);
+        UserParamsValidator.CheckName(dto.Name);
+        UserParamsValidator.CheckBirthday(dto.BirthDay);
+        
         var user = new User()
         {
             Id = Guid.NewGuid(),
@@ -42,7 +37,7 @@ public class AdminService : IAdminService
             ModifiedBy = createdBy,
             ModifiedOn = DateTime.Now
         };
-        result = await _userManager.CreateAsync(user, dto.Password);
+        var result = await _userManager.CreateAsync(user, dto.Password);
         if (user.IsAdmin)
         {
             var createdUser = await _userManager.FindByNameAsync(user.UserName);
@@ -53,15 +48,8 @@ public class AdminService : IAdminService
 
     public async Task<IdentityResult> UpdateUser(UpdateUserDto dto, string modifiedBy)
     {
-        if (string.IsNullOrEmpty(dto.Name))
-        {
-            return IdentityResult.Failed();
-        }
-
-        if (dto.BirthDay > DateTime.Now)
-        {
-            return IdentityResult.Failed();
-        }
+        UserParamsValidator.CheckName(dto.Name);
+        UserParamsValidator.CheckBirthday(dto.BirthDay);
 
         var user = await _userManager.FindByNameAsync(dto.UserName);
         
@@ -73,6 +61,4 @@ public class AdminService : IAdminService
 
         return await _userManager.UpdateAsync(user);
     }
-
-    private IdentityResult ValidateUpdateUserDto()
 }
