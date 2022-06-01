@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ATOH.WebAPI.Controllers;
 
+/// <summary>
+/// Controller for authentication.
+/// </summary>
 [ApiController]
 [ApiVersionNeutral]
 [Route("api/Auth")]
@@ -17,6 +20,11 @@ public class AuthController : Controller
     private readonly SignInManager<User> _signInManager;
     private readonly UserManager<User> _userManager;
 
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="signInManager"> SignInManager. </param>
+    /// <param name="userManager"> UserManager. </param>
     public AuthController(SignInManager<User> signInManager,
         UserManager<User> userManager)
     {
@@ -24,6 +32,11 @@ public class AuthController : Controller
         _userManager = userManager;
     }
 
+    /// <summary>
+    /// Login.
+    /// </summary>
+    /// <param name="viewModel"> UserName and password. </param>
+    /// <returns> Result. </returns>
     [HttpPost("Login")]
     [AllowAnonymous]
     public async Task<ActionResult> Login(LoginViewModel viewModel)

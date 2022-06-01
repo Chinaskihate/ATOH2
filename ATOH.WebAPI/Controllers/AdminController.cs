@@ -10,6 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ATOH.WebAPI.Controllers;
 
+/// <summary>
+/// Controller for admins.
+/// </summary>
 [ApiController]
 [ApiVersionNeutral]
 [Route("api/Admin")]
@@ -20,8 +23,13 @@ public class AdminController : Controller
     private readonly RoleManager<IdentityRole<Guid>> _roleManager;
     private readonly UserManager<User> _userManager;
 
-    public AdminController(SignInManager<User> signInManager,
-        UserManager<User> userManager,
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="userManager"> UserManager. </param>
+    /// <param name="roleManager"> RoleManager. </param>
+    /// <param name="adminService"> AdminService. </param>
+    public AdminController(UserManager<User> userManager,
         RoleManager<IdentityRole<Guid>> roleManager,
         IAdminService adminService)
     {
@@ -30,11 +38,16 @@ public class AdminController : Controller
         _adminService = adminService;
     }
 
+    /// <summary>
+    /// Create new user.
+    /// </summary>
+    /// <param name="dto"> CreateUserDto. </param>
+    /// <returns> NoContent if user was been created, otherwise bad request with exceptions. </returns>
     [HttpPost("CreateUser")]
     public async Task<ActionResult> CreateUser([FromBody] CreateUserDto dto)
     {
-        var createdBy = User.Identity.Name;
-        var result = await _adminService.CreateUser(dto, createdBy);
+        var createdBy = User.Identity!.Name;
+        var result = await _adminService.CreateUser(dto, createdBy!);
         if (result.Succeeded)
         {
             return NoContent();
@@ -43,11 +56,16 @@ public class AdminController : Controller
         return BadRequest(result);
     }
 
+    /// <summary>
+    /// Update user.
+    /// </summary>
+    /// <param name="dto"> UpdateUserDto. </param>
+    /// <returns>Ok if user was been updated, otherwise BadRequest with exceptions. </returns>
     [HttpPost("UpdateUser")]
     public async Task<ActionResult> UpdateUser([FromBody] UpdateUserDto dto)
     {
-        var userName = User.Identity.Name;
-        var result = await _adminService.UpdateUser(dto, userName);
+        var userName = User.Identity!.Name;
+        var result = await _adminService.UpdateUser(dto, userName!);
         if (result.Succeeded)
         {
             return Ok();
@@ -56,6 +74,10 @@ public class AdminController : Controller
         return BadRequest(result);
     }
 
+    /// <summary>
+    /// Create admin(for first admin).
+    /// </summary>
+    /// <returns> Ok. </returns>
     [HttpGet("CreateAdmin")]
     [AllowAnonymous]
     public async Task<ActionResult> CreateAdmin()
@@ -78,17 +100,22 @@ public class AdminController : Controller
         var result = await _userManager.CreateAsync(user, "1234");
         if (user.IsAdmin)
         {
-            var createdUser = await _userManager.FindByNameAsync(user.UserName);
-            var temp3 = await _userManager.AddToRoleAsync(user, "Admin");
+            await _userManager.FindByNameAsync(user.UserName);
+            await _userManager.AddToRoleAsync(user, "Admin");
         }
 
         return Ok(result);
     }
 
+    /// <summary>
+    /// Change password by admin.
+    /// </summary>
+    /// <param name="dto"> UserName and new password. </param>
+    /// <returns> NoContent if password has been updated. </returns>
     [HttpPost("ChangePassword")]
     public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordByAdminDto dto)
     {
-        var result = await _adminService.ChangePassword(dto, User.Identity.Name);
+        var result = await _adminService.ChangePassword(dto, User.Identity!.Name!);
         if (result.Succeeded)
         {
             return NoContent();
@@ -96,6 +123,12 @@ public class AdminController : Controller
         return BadRequest(result);
     }
 
+    /// <summary>
+    /// Change UserName by admin.
+    /// </summary>
+    /// <param name="oldUserName"> Old UserName. </param>
+    /// <param name="newUserName"> New UserName. </param>
+    /// <returns> Ok with new UserName if it has been changed, otherwise BadRequest. </returns>
     [HttpPost("ChangeUserName")]
     public async Task<ActionResult> ChangeUserName(string oldUserName, string newUserName)
     {
@@ -104,7 +137,7 @@ public class AdminController : Controller
         var result = await _userManager.UpdateAsync(user);
         if (result.Succeeded)
         {
-            user.ModifiedBy = User.Identity.Name;
+            user.ModifiedBy = User.Identity!.Name!;
             user.ModifiedOn = DateTime.Now;
             return Ok(newUserName);
         }
@@ -112,12 +145,21 @@ public class AdminController : Controller
         return BadRequest("Username already exists");
     }
 
+    /// <summary>
+    /// Get active users.
+    /// </summary>
+    /// <returns> Active users. </returns>
     [HttpGet("GetActiveUsers")]
     public async Task<ActionResult<IEnumerable<User>>> GetActiveUsers()
     {
         return Ok(await _userManager.GetActiveUsers());
     }
 
+    /// <summary>
+    /// Get user by UserName.
+    /// </summary>
+    /// <param name="userName"> UserName. </param>
+    /// <returns> UserVm. </returns>
     [HttpGet("GetUser")]
     public async Task<ActionResult<User>> GetUser(string userName)
     {
@@ -129,17 +171,29 @@ public class AdminController : Controller
 
         return Ok(new
         {
+            // TODO: change to user vm with automapper.
             name = user.Name, gender = user.Gender, birthDay = user.BirthDay,
             isActive = user.RevokedOn == null
         });
     }
 
+    /// <summary>
+    /// Get users older than some age.
+    /// </summary>
+    /// <param name="age"> Age in years. </param>
+    /// <returns> Users. </returns>
     [HttpGet("GetOlderThan")]
-    public async Task<ActionResult<IEnumerable<User>>> GetOlderThan(int years)
+    public async Task<ActionResult<IEnumerable<User>>> GetOlderThan(int age)
     {
-        return Ok(await _userManager.GetOlderThan(years));
+        return Ok(await _userManager.GetOlderThan(age));
     }
 
+    /// <summary>
+    /// Deletes user.
+    /// </summary>
+    /// <param name="userName"> UserName. </param>
+    /// <param name="isSoft"> Is soft delete. </param>
+    /// <returns> Result. </returns>
     [HttpDelete("DeleteUser")]
     public async Task<ActionResult> DeleteUser(string userName, bool isSoft)
     {
@@ -152,7 +206,7 @@ public class AdminController : Controller
         if (isSoft)
         {
             user.RevokedOn = DateTime.Now;
-            user.RevokedBy = User.Identity.Name;
+            user.RevokedBy = User.Identity!.Name;
             var result = await _userManager.UpdateAsync(user);
             return Ok(result);
         }
@@ -160,6 +214,11 @@ public class AdminController : Controller
         return Ok(await _userManager.DeleteAsync(user));
     }
 
+    /// <summary>
+    /// Recovers user.
+    /// </summary>
+    /// <param name="userName"> UserName. </param>
+    /// <returns> Result. </returns>
     [HttpPost("RecoverUser")]
     public async Task<ActionResult> RecoverUser(string userName)
     {
@@ -172,7 +231,12 @@ public class AdminController : Controller
         user.RevokedOn = null;
         user.RevokedBy = null;
         var result = await _userManager.UpdateAsync(user);
-        return Ok(result);
+        if (result.Succeeded)
+        {
+            return Ok("User has been updated.");
+        }
+
+        return BadRequest(result);
     }
 
     private void AddErrorsFromResult(IdentityResult result)

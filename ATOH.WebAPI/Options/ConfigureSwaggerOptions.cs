@@ -6,15 +6,26 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace ATOH.WebAPI.Options;
 
+/// <summary>
+/// Configure different swagger options.
+/// </summary>
 public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
 {
     private readonly IApiVersionDescriptionProvider _provider;
 
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="provider"> ApiVersionDescriptionProvider for versions. </param>
     public ConfigureSwaggerOptions(IApiVersionDescriptionProvider provider)
     {
         _provider = provider;
     }
 
+    /// <summary>
+    /// Configure swagger.
+    /// </summary>
+    /// <param name="options"> Swagger options. </param>
     public void Configure(SwaggerGenOptions options)
     {
         foreach (var description in _provider.ApiVersionDescriptions)
