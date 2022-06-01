@@ -11,21 +11,18 @@ namespace ATOH.Application.Services.AdminServices;
 public class AdminService : IAdminService
 {
     private readonly UserManager<User> _userManager;
-    private readonly RoleManager<IdentityRole<Guid>> _roleManager;
 
-    public AdminService(UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager)
+    public AdminService(UserManager<User> userManager)
     {
         _userManager = userManager;
-        _roleManager = roleManager;
     }
 
     public async Task<IdentityResult> CreateUser(CreateUserDto dto, string createdBy)
     {
-        UserParamsValidator.CheckUserName(dto.UserName);
         UserParamsValidator.CheckName(dto.Name);
         UserParamsValidator.CheckBirthday(dto.BirthDay);
-        
-        var user = new User()
+
+        var user = new User
         {
             Id = Guid.NewGuid(),
             UserName = dto.UserName,
@@ -44,6 +41,7 @@ public class AdminService : IAdminService
             var createdUser = await _userManager.FindByNameAsync(user.UserName);
             await _userManager.AddToRoleAsync(createdUser, "Admin");
         }
+
         return result;
     }
 
@@ -68,7 +66,7 @@ public class AdminService : IAdminService
         UserParamsValidator.CheckBirthday(dto.BirthDay);
 
         var user = await _userManager.FindByNameAsync(dto.UserName);
-        
+
         user.Name = dto.Name;
         user.BirthDay = dto.BirthDay;
         user.Gender = dto.Gender;

@@ -4,14 +4,6 @@ namespace ATOH.Application.Common.Validators;
 
 public static class UserParamsValidator
 {
-    public static void CheckUserName(string userName)
-    {
-        if (string.IsNullOrEmpty(userName))
-        {
-            throw new ArgumentException("UserName can't be null or empty.", nameof(userName));
-        }
-    }
-
     public static void CheckName(string name)
     {
         if (string.IsNullOrEmpty(name))

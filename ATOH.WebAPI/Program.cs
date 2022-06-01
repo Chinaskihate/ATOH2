@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Text;
 using ATOH.Application;
+using ATOH.Application.Common.Mappings;
 using ATOH.Domain.Models;
 using ATOH.Persistence;
 using ATOH.WebAPI;
@@ -41,6 +42,10 @@ void RegisterServices(IServiceCollection services, IConfiguration config)
 {
     services.AddApplication();
     services.AddPersistence(config["DbConnection"]);
+    services.AddAutoMapper(config =>
+    {
+        config.AddProfile(new AssemblyMappingProfile(Assembly.GetExecutingAssembly()));
+    });
 
     services.AddIdentity<User, IdentityRole<Guid>>(config =>
     {

@@ -49,10 +49,13 @@ public class CustomExceptionHandlerMiddleware
         var result = string.Empty;
         switch (ex)
         {
-            case ArgumentException argumentException:
+            case ArgumentException:
                 code = HttpStatusCode.BadRequest;
                 break;
-            case RevokedUserException revokedUserException:
+            case UserNotFoundException:
+                code = HttpStatusCode.NotFound;
+                break;
+            case RevokedUserException:
                 code = HttpStatusCode.Forbidden;
                 break;
         }

@@ -1,18 +1,23 @@
-﻿using ATOH.Application.Common.Validators;
+﻿using ATOH.Application.Common.Exceptions;
+using ATOH.Application.Common.Validators;
 using ATOH.Application.Interfaces.UserServices;
+using ATOH.Application.Users;
 using ATOH.Application.Users.ChangePassword;
 using ATOH.Application.Users.UpdateUser;
 using ATOH.Domain.Models;
+using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 
 namespace ATOH.Application.Services.UserServices;
 
 public class UserService : IUserService
 {
+    private readonly IMapper _mapper;
     private readonly UserManager<User> _userManager;
 
-    public UserService(UserManager<User> userManager)
+    public UserService(IMapper mapper, UserManager<User> userManager)
     {
+        _mapper = mapper;
         _userManager = userManager;
     }
 
@@ -45,5 +50,16 @@ public class UserService : IUserService
         }
 
         return result;
+    }
+
+    public async Task<UserLookupDto> GetUser(string userName)
+    {
+        var user = await _userManager.FindByNameAsync(userName);
+        if (user == null)
+        {
+            throw new UserNotFoundException(userName);
+        }
+
+        return _mapper.Map<UserLookupDto>(user);
     }
 }
