@@ -1,5 +1,6 @@
 ﻿using ATOH.Application.Common.Validators;
 using ATOH.Application.Interfaces.AdminService;
+using ATOH.Application.Users.ChangePassword;
 using ATOH.Application.Users.CreateUser;
 using ATOH.Application.Users.UpdateUser;
 using ATOH.Domain.Models;
@@ -43,6 +44,21 @@ public class AdminService : IAdminService
             var createdUser = await _userManager.FindByNameAsync(user.UserName);
             await _userManager.AddToRoleAsync(createdUser, "Admin");
         }
+        return result;
+    }
+
+    public async Task<IdentityResult> ChangePassword(ChangePasswordByAdminDto dto, string modifiedBy)
+    {
+        var user = await _userManager.FindByNameAsync(dto.UserName);
+        await _userManager.RemovePasswordAsync(user);
+        var result = await _userManager.AddPasswordAsync(user, dto.NewPassword);
+
+        if (result.Succeeded)
+        {
+            user.ModifiedBy = modifiedBy;
+            user.ModifiedOn = DateTime.Now;
+        }
+
         return result;
     }
 

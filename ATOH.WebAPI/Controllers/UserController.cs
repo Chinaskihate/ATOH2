@@ -38,25 +38,22 @@ public class UserController : Controller
         var result = await _userService.UpdateUser(dto, userName);
         if (result.Succeeded)
         {
-            return Ok();
+            return NoContent();
         }
 
         return BadRequest(result);
     }
 
     [HttpPost("ChangePassword")]
-    public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordByUserDto byUserDto)
+    public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordByUserDto dto)
     {
-        var user = await _userManager.FindByNameAsync(User.Identity.Name);
-        var result = await _userManager.ChangePasswordAsync(user, byUserDto.OldPassword, byUserDto.NewPassword);
+        var result = await _userService.ChangePassword(dto, User.Identity.Name);
         if (result.Succeeded)
         {
-            user.ModifiedBy = user.UserName;
-            user.ModifiedOn = DateTime.Now;
-            return Ok();
+            return NoContent();
         }
 
-        return BadRequest();
+        return BadRequest(result);
     }
 
     [HttpPost("ChangeUserName")]

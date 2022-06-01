@@ -37,9 +37,9 @@ public class AdminController : Controller
         var result = await _adminService.CreateUser(dto, createdBy);
         if (result.Succeeded)
         {
-            return Ok(result);
+            return NoContent();
         }
-
+        AddErrorsFromResult(result);
         return BadRequest(result);
     }
 
@@ -88,17 +88,12 @@ public class AdminController : Controller
     [HttpPost("ChangePassword")]
     public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordByAdminDto dto)
     {
-        var user = await _userManager.FindByNameAsync(dto.UserName);
-        await _userManager.RemovePasswordAsync(user);
-        var result = await _userManager.AddPasswordAsync(user, dto.NewPassword);
+        var result = await _adminService.ChangePassword(dto, User.Identity.Name);
         if (result.Succeeded)
         {
-            user.ModifiedBy = User.Identity.Name;
-            user.ModifiedOn = DateTime.Now;
-            return Ok();
+            return NoContent();
         }
-
-        return BadRequest();
+        return BadRequest(result);
     }
 
     [HttpPost("ChangeUserName")]
@@ -178,5 +173,13 @@ public class AdminController : Controller
         user.RevokedBy = null;
         var result = await _userManager.UpdateAsync(user);
         return Ok(result);
+    }
+
+    private void AddErrorsFromResult(IdentityResult result)
+    {
+        foreach (var error in result.Errors)
+        {
+            ModelState.AddModelError("", error.Description);
+        }
     }
 }

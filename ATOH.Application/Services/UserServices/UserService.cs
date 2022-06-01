@@ -1,5 +1,6 @@
 ﻿using ATOH.Application.Common.Validators;
 using ATOH.Application.Interfaces.UserServices;
+using ATOH.Application.Users.ChangePassword;
 using ATOH.Application.Users.UpdateUser;
 using ATOH.Domain.Models;
 using Microsoft.AspNetCore.Identity;
@@ -30,5 +31,19 @@ public class UserService : IUserService
         user.ModifiedBy = modifiedBy;
 
         return await _userManager.UpdateAsync(user);
+    }
+
+    public async Task<IdentityResult> ChangePassword(ChangePasswordByUserDto dto, string userName)
+    {
+        var user = await _userManager.FindByNameAsync(userName);
+
+        var result = await _userManager.ChangePasswordAsync(user, dto.OldPassword, dto.NewPassword);
+        if (result.Succeeded)
+        {
+            user.ModifiedBy = user.UserName;
+            user.ModifiedOn = DateTime.Now;
+        }
+
+        return result;
     }
 }
