@@ -15,12 +15,14 @@ namespace ATOH.Application.Services.AdminServices;
 public class AdminService : IAdminService
 {
     private readonly UserManager<User> _userManager;
+    private readonly RoleManager<IdentityRole<Guid>> _roleManager;
     private readonly IMapper _mapper;
 
-    public AdminService(UserManager<User> userManager, IMapper _mapper)
+    public AdminService(UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager, IMapper mapper)
     {
         _userManager = userManager;
-        this._mapper = _mapper;
+        _roleManager = roleManager;
+        _mapper = mapper;
     }
 
     public async Task<IdentityResult> CreateUser(CreateUserDto dto, string createdBy)
@@ -159,6 +161,36 @@ public class AdminService : IAdminService
         user.ModifiedOn = DateTime.Now;
         user.ModifiedBy = modifiedBy;
         var result = await _userManager.UpdateAsync(user);
+
+        return result;
+    }
+
+    public async Task<IdentityResult> CreateFirstAdmin()
+    {
+        await _roleManager.CreateAsync(new IdentityRole<Guid>("Admin"));
+        await _roleManager.CreateAsync(new IdentityRole<Guid>("User"));
+        var user = new User
+        {
+            Id = Guid.NewGuid(),
+            UserName = "Admin",
+            IsAdmin = true,
+            BirthDay = DateTime.Now,
+            CreatedBy = "DbInitializer",
+            CreatedOn = DateTime.Now,
+            Gender = Gender.Other,
+            Name = "Admin",
+            ModifiedBy = "DbInitializer",
+            ModifiedOn = DateTime.Now
+        };
+        var result = await _userManager.CreateAsync(user, "1234");
+        if (result.Succeeded)
+        {
+            if (user.IsAdmin)
+            {
+                await _userManager.FindByNameAsync(user.UserName);
+                await _userManager.AddToRoleAsync(user, "Admin");
+            }
+        }
 
         return result;
     }

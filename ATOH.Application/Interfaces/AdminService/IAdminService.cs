@@ -24,4 +24,6 @@ public interface IAdminService : IUserUpdater
     Task<IdentityResult> DeleteUser(string userName, bool isSoft, string revokedBy);
 
     Task<IdentityResult> RecoverUser(string userName, string modifiedBy);
+
+    Task<IdentityResult> CreateFirstAdmin();
 }
