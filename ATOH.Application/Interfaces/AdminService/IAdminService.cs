@@ -16,6 +16,7 @@ public interface IAdminService : IUserUpdater
     Task<IdentityResult> ChangeUserName(string oldUserName, string newUserName, string modifiedBy);
 
     Task<IEnumerable<User>> GetActiveUsers();
+    Task<IEnumerable<User>> GetOlderThan(int age);
 
     Task<UserLookupDto> GetUserData(string userName);
 }

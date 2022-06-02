@@ -117,4 +117,12 @@ public class AdminService : IAdminService
 
         return _mapper.Map<UserLookupDto>(user);
     }
+
+    public async Task<IEnumerable<User>> GetOlderThan(int age)
+    {
+        return (await _userManager.Users
+                .ToListAsync())
+            .Where(u => (DateTime.Now - u.BirthDay).Value.Days > age * 365)
+            .OrderBy(u => u.BirthDay);
+    }
 }

@@ -125,7 +125,7 @@ public class AdminController : Controller
         {
             return NoContent();
         }
-        return BadRequest(result);
+        return BadRequest(result.Errors);
     }
 
     /// <summary>
@@ -175,7 +175,7 @@ public class AdminController : Controller
     [HttpGet("GetOlderThan")]
     public async Task<ActionResult<IEnumerable<User>>> GetOlderThan(int age)
     {
-        return Ok(await _userManager.GetOlderThan(age));
+        return Ok(await _adminService.GetOlderThan(age));
     }
 
     /// <summary>
@@ -226,6 +226,6 @@ public class AdminController : Controller
             return Ok("User has been updated.");
         }
 
-        return BadRequest(result);
+        return BadRequest(result.Errors);
     }
 }
