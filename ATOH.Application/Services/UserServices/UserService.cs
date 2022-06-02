@@ -62,4 +62,21 @@ public class UserService : IUserService
 
         return _mapper.Map<UserLookupDto>(user);
     }
+
+    public async Task<IdentityResult> ChangeUserName(string oldUserName, string newUserName)
+    {
+        var user = await _userManager.FindByNameAsync(oldUserName);
+        if (user == null)
+        {
+            throw new UserNotFoundException(oldUserName);
+        }
+
+        if (user.RevokedOn != null)
+        {
+            throw new RevokedUserException(oldUserName, (DateTime)user.RevokedOn);
+        }
+
+        var result = await _userManager.SetUserNameAsync(user, newUserName);
+        return result;
+    }
 }

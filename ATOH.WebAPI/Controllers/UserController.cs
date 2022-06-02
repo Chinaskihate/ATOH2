@@ -1,5 +1,6 @@
 ﻿using ATOH.Application.Interfaces.AdminService;
 using ATOH.Application.Interfaces.UserServices;
+using ATOH.Application.Users;
 using ATOH.Application.Users.ChangePassword;
 using ATOH.Application.Users.UpdateUser;
 using ATOH.Domain.Models;
@@ -19,17 +20,13 @@ namespace ATOH.WebAPI.Controllers;
 public class UserController : Controller
 {
     private readonly IUserService _userService;
-    private readonly UserManager<User> _userManager;
 
     /// <summary>
     /// Constructor.
     /// </summary>
-    /// <param name="userManager"> UserManager. </param>
     /// <param name="userService"> UserService. </param>
-    public UserController(UserManager<User> userManager,
-        IUserService userService)
+    public UserController(IUserService userService)
     {
-        _userManager = userManager;
         _userService = userService;
     }
 
@@ -48,7 +45,7 @@ public class UserController : Controller
             return NoContent();
         }
 
-        return BadRequest(result);
+        return BadRequest(result.Errors);
     }
 
     /// <summary>
@@ -65,7 +62,7 @@ public class UserController : Controller
             return NoContent();
         }
 
-        return BadRequest(result);
+        return BadRequest(result.Errors);
     }
 
     /// <summary>
@@ -76,21 +73,13 @@ public class UserController : Controller
     [HttpPost("ChangeUserName")]
     public async Task<ActionResult> ChangeUserName(string newUserName)
     {
-        var user = await _userManager.FindByNameAsync(User.Identity!.Name);
-        if (user.RevokedOn == null)
-        {
-            return Forbid();
-        }
-        user.UserName = newUserName;
-        var result = await _userManager.UpdateAsync(user);
+        var result = await _userService.ChangeUserName(User.Identity!.Name!, newUserName);
         if (result.Succeeded)
         {
-            user.ModifiedBy = user.UserName;
-            user.ModifiedOn = DateTime.Now;
             return Ok(newUserName);
         }
 
-        return BadRequest("Username already exists");
+        return BadRequest(result.Errors);
     }
 
     /// <summary>
@@ -98,16 +87,9 @@ public class UserController : Controller
     /// </summary>
     /// <returns> User data. </returns>
     [HttpPost("GetData")]
-    public async Task<ActionResult> GetData()
+    public async Task<ActionResult<UserLookupDto>> GetData()
     {
-        var user = await _userManager.FindByNameAsync(User.Identity!.Name);
-        
-        return Ok(new
-        {
-            name = user.Name,
-            gender = user.Gender,
-            birthDay = user.BirthDay,
-            isActive = user.RevokedOn == null
-        });
+        var dto = await _userService.GetUser(User.Identity!.Name!);
+        return Ok(dto);
     }
 }
