@@ -52,8 +52,8 @@ public class AdminController : Controller
         {
             return NoContent();
         }
-        AddErrorsFromResult(result);
-        return BadRequest(result);
+
+        return BadRequest(result.Errors);
     }
 
     /// <summary>
@@ -71,7 +71,7 @@ public class AdminController : Controller
             return Ok();
         }
 
-        return BadRequest(result);
+        return BadRequest(result.Errors);
     }
 
     /// <summary>
@@ -98,13 +98,18 @@ public class AdminController : Controller
             ModifiedOn = DateTime.Now
         };
         var result = await _userManager.CreateAsync(user, "1234");
-        if (user.IsAdmin)
+        if (result.Succeeded)
         {
-            await _userManager.FindByNameAsync(user.UserName);
-            await _userManager.AddToRoleAsync(user, "Admin");
+            if (user.IsAdmin)
+            {
+                await _userManager.FindByNameAsync(user.UserName);
+                await _userManager.AddToRoleAsync(user, "Admin");
+            }
+
+            return Ok(user.Id);
         }
 
-        return Ok(result);
+        return BadRequest(result.Errors);
     }
 
     /// <summary>
@@ -132,17 +137,13 @@ public class AdminController : Controller
     [HttpPost("ChangeUserName")]
     public async Task<ActionResult> ChangeUserName(string oldUserName, string newUserName)
     {
-        var user = await _userManager.FindByNameAsync(oldUserName);
-        user.UserName = newUserName;
-        var result = await _userManager.UpdateAsync(user);
+        var result = await _adminService.ChangeUserName(oldUserName, newUserName, User.Identity!.Name!);
         if (result.Succeeded)
         {
-            user.ModifiedBy = User.Identity!.Name!;
-            user.ModifiedOn = DateTime.Now;
             return Ok(newUserName);
         }
 
-        return BadRequest("Username already exists");
+        return BadRequest(result.Errors);
     }
 
     /// <summary>
@@ -237,13 +238,5 @@ public class AdminController : Controller
         }
 
         return BadRequest(result);
-    }
-
-    private void AddErrorsFromResult(IdentityResult result)
-    {
-        foreach (var error in result.Errors)
-        {
-            ModelState.AddModelError("", error.Description);
-        }
     }
 }

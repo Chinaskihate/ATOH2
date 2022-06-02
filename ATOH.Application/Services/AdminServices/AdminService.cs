@@ -1,4 +1,5 @@
-﻿using ATOH.Application.Common.Validators;
+﻿using ATOH.Application.Common.Exceptions;
+using ATOH.Application.Common.Validators;
 using ATOH.Application.Interfaces.AdminService;
 using ATOH.Application.Users.ChangePassword;
 using ATOH.Application.Users.CreateUser;
@@ -74,5 +75,23 @@ public class AdminService : IAdminService
         user.ModifiedBy = modifiedBy;
 
         return await _userManager.UpdateAsync(user);
+    }
+
+    public async Task<IdentityResult> ChangeUserName(string oldUserName, string newUserName, string modifiedBy)
+    {
+        var user = await _userManager.FindByNameAsync(oldUserName);
+        if (user == null)
+        {
+            throw new UserNotFoundException(oldUserName);
+        }
+
+        var result = await _userManager.SetUserNameAsync(user, newUserName);
+        if (result.Succeeded)
+        {
+            user.ModifiedBy = modifiedBy;
+            user.ModifiedOn = DateTime.Now;
+        }
+
+        return result;
     }
 }

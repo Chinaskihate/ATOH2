@@ -10,4 +10,6 @@ public interface IAdminService : IUserUpdater
     Task<IdentityResult> CreateUser(CreateUserDto dto, string createdBy);
 
     Task<IdentityResult> ChangePassword(ChangePasswordByAdminDto dto, string modifiedBy);
+
+    Task<IdentityResult> ChangeUserName(string oldUserName, string newUserName, string modifiedBy);
 }

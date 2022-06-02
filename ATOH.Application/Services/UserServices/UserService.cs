@@ -81,6 +81,11 @@ public class UserService : IUserService
         }
 
         var result = await _userManager.SetUserNameAsync(user, newUserName);
+        if (result.Succeeded)
+        {
+            user.ModifiedBy = user.UserName;
+            user.ModifiedOn = DateTime.Now;
+        }
         return result;
     }
 }
