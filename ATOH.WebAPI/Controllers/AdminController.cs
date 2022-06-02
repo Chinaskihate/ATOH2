@@ -153,7 +153,7 @@ public class AdminController : Controller
     [HttpGet("GetActiveUsers")]
     public async Task<ActionResult<IEnumerable<User>>> GetActiveUsers()
     {
-        return Ok(await _userManager.GetActiveUsers());
+        return Ok(await _adminService.GetActiveUsers());
     }
 
     /// <summary>
@@ -161,21 +161,10 @@ public class AdminController : Controller
     /// </summary>
     /// <param name="userName"> UserName. </param>
     /// <returns> UserVm. </returns>
-    [HttpGet("GetUser")]
-    public async Task<ActionResult<User>> GetUser(string userName)
+    [HttpGet("GetUserData")]
+    public async Task<ActionResult<User>> GetUserData(string userName)
     {
-        var user = await _userManager.FindByNameAsync(userName);
-        if (user == null)
-        {
-            return NotFound(userName);
-        }
-
-        return Ok(new
-        {
-            // TODO: change to user vm with automapper.
-            name = user.Name, gender = user.Gender, birthDay = user.BirthDay,
-            isActive = user.RevokedOn == null
-        });
+        return Ok(await _adminService.GetUserData(userName));
     }
 
     /// <summary>

@@ -86,7 +86,7 @@ public class UserController : Controller
     [HttpPost("GetData")]
     public async Task<ActionResult<UserLookupDto>> GetData()
     {
-        var dto = await _userService.GetUser(User.Identity!.Name!);
+        var dto = await _userService.GetUserData(User.Identity!.Name!);
         return Ok(dto);
     }
 }

@@ -1,4 +1,7 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
+using ATOH.Application.Users;
+using ATOH.Domain.Models;
 using AutoMapper;
 
 namespace ATOH.Application.Common.Mappings;
@@ -12,7 +15,7 @@ public class AssemblyMappingProfile : Profile
 
     private void ApplyMappingsFromAssembly(Assembly assembly)
     {
-        var types = assembly.GetExportedTypes()
+        var types = assembly.GetExportedTypes().Concat(Assembly.GetAssembly(GetType()).GetExportedTypes())
             .Where(type => type.GetInterfaces()
                 .Any(i => i.IsGenericType &&
                           i.GetGenericTypeDefinition() == typeof(IMapWith<>)))

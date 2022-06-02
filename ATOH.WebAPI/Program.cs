@@ -40,12 +40,12 @@ app.Run();
 
 void RegisterServices(IServiceCollection services, IConfiguration config)
 {
-    services.AddApplication();
-    services.AddPersistence(config["DbConnection"]);
     services.AddAutoMapper(config =>
     {
         config.AddProfile(new AssemblyMappingProfile(Assembly.GetExecutingAssembly()));
     });
+    services.AddApplication();
+    services.AddPersistence(config["DbConnection"]);
 
     services.AddIdentity<User, IdentityRole<Guid>>(config =>
     {

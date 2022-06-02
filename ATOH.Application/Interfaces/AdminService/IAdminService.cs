@@ -1,6 +1,8 @@
 ﻿using ATOH.Application.Interfaces.UserUpdaterServices;
+using ATOH.Application.Users;
 using ATOH.Application.Users.ChangePassword;
 using ATOH.Application.Users.CreateUser;
+using ATOH.Domain.Models;
 using Microsoft.AspNetCore.Identity;
 
 namespace ATOH.Application.Interfaces.AdminService;
@@ -12,4 +14,8 @@ public interface IAdminService : IUserUpdater
     Task<IdentityResult> ChangePassword(ChangePasswordByAdminDto dto, string modifiedBy);
 
     Task<IdentityResult> ChangeUserName(string oldUserName, string newUserName, string modifiedBy);
+
+    Task<IEnumerable<User>> GetActiveUsers();
+
+    Task<UserLookupDto> GetUserData(string userName);
 }

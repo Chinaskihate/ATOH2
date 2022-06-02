@@ -9,7 +9,7 @@ public interface IUserService : IUserUpdater
 {
     Task<IdentityResult> ChangePassword(ChangePasswordByUserDto dto, string userName);
 
-    Task<UserLookupDto> GetUser(string userName);
+    Task<UserLookupDto> GetUserData(string userName);
 
     Task<IdentityResult> ChangeUserName(string oldUserName, string newUserName);
 }

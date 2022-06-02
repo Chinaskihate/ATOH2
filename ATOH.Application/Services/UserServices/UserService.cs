@@ -56,7 +56,7 @@ public class UserService : IUserService
         return result;
     }
 
-    public async Task<UserLookupDto> GetUser(string userName)
+    public async Task<UserLookupDto> GetUserData(string userName)
     {
         var user = await _userManager.FindByNameAsync(userName);
         if (user == null)

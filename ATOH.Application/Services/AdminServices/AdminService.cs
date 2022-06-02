@@ -1,21 +1,26 @@
 ﻿using ATOH.Application.Common.Exceptions;
 using ATOH.Application.Common.Validators;
 using ATOH.Application.Interfaces.AdminService;
+using ATOH.Application.Users;
 using ATOH.Application.Users.ChangePassword;
 using ATOH.Application.Users.CreateUser;
 using ATOH.Application.Users.UpdateUser;
 using ATOH.Domain.Models;
+using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace ATOH.Application.Services.AdminServices;
 
 public class AdminService : IAdminService
 {
     private readonly UserManager<User> _userManager;
+    private readonly IMapper _mapper;
 
-    public AdminService(UserManager<User> userManager)
+    public AdminService(UserManager<User> userManager, IMapper _mapper)
     {
         _userManager = userManager;
+        this._mapper = _mapper;
     }
 
     public async Task<IdentityResult> CreateUser(CreateUserDto dto, string createdBy)
@@ -93,5 +98,23 @@ public class AdminService : IAdminService
         }
 
         return result;
+    }
+
+    public async Task<IEnumerable<User>> GetActiveUsers()
+    {
+        return await _userManager.Users.Where(u => u.RevokedOn == null)
+            .OrderBy(u => u.CreatedOn)
+            .ToListAsync();
+    }
+
+    public async Task<UserLookupDto> GetUserData(string userName)
+    {
+        var user = await _userManager.FindByNameAsync(userName);
+        if (user == null)
+        {
+            throw new UserNotFoundException(userName);
+        }
+
+        return _mapper.Map<UserLookupDto>(user);
     }
 }
