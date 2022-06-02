@@ -52,6 +52,9 @@ public class CustomExceptionHandlerMiddleware
             case ArgumentException:
                 code = HttpStatusCode.BadRequest;
                 break;
+            case UserAlreadyExistsException:
+                code = HttpStatusCode.Conflict;
+                break;
             case UserNotFoundException:
                 code = HttpStatusCode.NotFound;
                 break;

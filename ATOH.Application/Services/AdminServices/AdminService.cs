@@ -56,6 +56,10 @@ public class AdminService : IAdminService
     public async Task<IdentityResult> ChangePassword(ChangePasswordByAdminDto dto, string modifiedBy)
     {
         var user = await _userManager.FindByNameAsync(dto.UserName);
+        if (user == null)
+        {
+            throw new UserNotFoundException(dto.UserName);
+        }
         await _userManager.RemovePasswordAsync(user);
         var result = await _userManager.AddPasswordAsync(user, dto.NewPassword);
 
@@ -90,6 +94,12 @@ public class AdminService : IAdminService
         if (user == null)
         {
             throw new UserNotFoundException(oldUserName);
+        }
+
+        var otherUser = await _userManager.FindByNameAsync(newUserName);
+        if (otherUser != null)
+        {
+            throw new UserAlreadyExistsException(newUserName);
         }
 
         var result = await _userManager.SetUserNameAsync(user, newUserName);

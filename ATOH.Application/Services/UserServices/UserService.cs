@@ -80,6 +80,12 @@ public class UserService : IUserService
             throw new RevokedUserException(oldUserName, (DateTime)user.RevokedOn);
         }
 
+        var otherUser = await _userManager.FindByNameAsync(newUserName);
+        if (otherUser == null)
+        {
+            throw new UserAlreadyExistsException(newUserName);
+        }
+
         var result = await _userManager.SetUserNameAsync(user, newUserName);
         if (result.Succeeded)
         {

@@ -1,17 +1,15 @@
-﻿using ATOH.Application.Extensions;
-using ATOH.Application.Interfaces.AdminService;
+﻿using ATOH.Application.Interfaces.AdminService;
 using ATOH.Application.Users.ChangePassword;
 using ATOH.Application.Users.CreateUser;
 using ATOH.Application.Users.UpdateUser;
 using ATOH.Domain.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ATOH.WebAPI.Controllers;
 
 /// <summary>
-/// Controller for admins.
+///     Controller for admins.
 /// </summary>
 [ApiController]
 [ApiVersionNeutral]
@@ -20,29 +18,26 @@ namespace ATOH.WebAPI.Controllers;
 public class AdminController : Controller
 {
     private readonly IAdminService _adminService;
-    private readonly RoleManager<IdentityRole<Guid>> _roleManager;
-    private readonly UserManager<User> _userManager;
 
     /// <summary>
-    /// Constructor.
+    ///     Constructor.
     /// </summary>
     /// <param name="userManager"> UserManager. </param>
     /// <param name="roleManager"> RoleManager. </param>
     /// <param name="adminService"> AdminService. </param>
-    public AdminController(UserManager<User> userManager,
-        RoleManager<IdentityRole<Guid>> roleManager,
-        IAdminService adminService)
+    public AdminController(IAdminService adminService)
     {
-        _userManager = userManager;
-        _roleManager = roleManager;
         _adminService = adminService;
     }
 
     /// <summary>
-    /// Create new user.
+    ///     Create new user.
     /// </summary>
     /// <param name="dto"> CreateUserDto. </param>
-    /// <returns> NoContent if user was been created, otherwise bad request with exceptions. </returns>
+    /// <returns> Nothing or errors. </returns>
+    /// <response code="204"> Success. </response>
+    /// <response code="400"> If something went wrong. </response>
+    /// <response code="401"> If the user if unauthorized. </response>
     [HttpPost("CreateUser")]
     public async Task<ActionResult> CreateUser([FromBody] CreateUserDto dto)
     {
@@ -57,10 +52,14 @@ public class AdminController : Controller
     }
 
     /// <summary>
-    /// Update user.
+    ///     Update user.
     /// </summary>
     /// <param name="dto"> UpdateUserDto. </param>
-    /// <returns>Ok if user was been updated, otherwise BadRequest with exceptions. </returns>
+    /// <returns> Nothing or errors. </returns>
+    /// <response code="204"> Success. </response>
+    /// <response code="400"> If something went wrong. </response>
+    /// <response code="401"> If the user if unauthorized. </response>
+    /// <response code="404"> If the user not found. </response>
     [HttpPost("UpdateUser")]
     public async Task<ActionResult> UpdateUser([FromBody] UpdateUserDto dto)
     {
@@ -68,16 +67,19 @@ public class AdminController : Controller
         var result = await _adminService.UpdateUser(dto, userName!);
         if (result.Succeeded)
         {
-            return Ok();
+            return NoContent();
         }
 
         return BadRequest(result.Errors);
     }
 
     /// <summary>
-    /// Create admin(for first admin).
+    ///     Create admin(for first admin).
     /// </summary>
-    /// <returns> Ok. </returns>
+    /// <returns> Nothing or errors. </returns>
+    /// <response code="204"> Success. </response>
+    /// <response code="400"> If something went wrong. </response>
+    /// <response code="401"> If the user if unauthorized. </response>
     [HttpGet("CreateAdmin")]
     [AllowAnonymous]
     public async Task<ActionResult> CreateAdmin()
@@ -92,10 +94,14 @@ public class AdminController : Controller
     }
 
     /// <summary>
-    /// Change password by admin.
+    ///     Change password by admin.
     /// </summary>
     /// <param name="dto"> UserName and new password. </param>
-    /// <returns> NoContent if password has been updated. </returns>
+    /// <returns> Nothing or errors. </returns>
+    /// <response code="204"> Success. </response>
+    /// <response code="400"> If something went wrong. </response>
+    /// <response code="401"> If the user if unauthorized. </response>
+    /// <response code="404"> If the user not found. </response>
     [HttpPost("ChangePassword")]
     public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordByAdminDto dto)
     {
@@ -104,15 +110,21 @@ public class AdminController : Controller
         {
             return NoContent();
         }
+
         return BadRequest(result.Errors);
     }
 
     /// <summary>
-    /// Change UserName by admin.
+    ///     Change UserName by admin.
     /// </summary>
     /// <param name="oldUserName"> Old UserName. </param>
     /// <param name="newUserName"> New UserName. </param>
-    /// <returns> Ok with new UserName if it has been changed, otherwise BadRequest. </returns>
+    /// <returns> New UserName or errors. </returns>
+    /// <response code="200"> Success.</response>
+    /// <response code="400"> If something went wrong. </response>
+    /// <response code="401"> If the user if unauthorized. </response>
+    /// <response code="404"> If the user not found. </response>
+    /// <response code="409"> If new UserName is already taken. </response>
     [HttpPost("ChangeUserName")]
     public async Task<ActionResult> ChangeUserName(string oldUserName, string newUserName)
     {
@@ -126,9 +138,11 @@ public class AdminController : Controller
     }
 
     /// <summary>
-    /// Get active users.
+    ///     Get active users.
     /// </summary>
     /// <returns> Active users. </returns>
+    /// <response code="200"> Success. </response>
+    /// <response code="401"> If the user if unauthorized.</response>
     [HttpGet("GetActiveUsers")]
     public async Task<ActionResult<IEnumerable<User>>> GetActiveUsers()
     {
@@ -136,10 +150,13 @@ public class AdminController : Controller
     }
 
     /// <summary>
-    /// Get user by UserName.
+    ///     Get user by UserName.
     /// </summary>
     /// <param name="userName"> UserName. </param>
     /// <returns> UserVm. </returns>
+    /// <response code="200"> Success. </response>
+    /// <response code="401"> If the user if unauthorized. </response>
+    /// <response code="404"> If the user not found. </response>
     [HttpGet("GetUserData")]
     public async Task<ActionResult<User>> GetUserData(string userName)
     {
@@ -147,10 +164,12 @@ public class AdminController : Controller
     }
 
     /// <summary>
-    /// Get users older than some age.
+    ///     Get users older than some age.
     /// </summary>
     /// <param name="age"> Age in years. </param>
     /// <returns> Users. </returns>
+    /// <response code="200"> Success. </response>
+    /// <response code="401"> If the user if unauthorized. </response>
     [HttpGet("GetOlderThan")]
     public async Task<ActionResult<IEnumerable<User>>> GetOlderThan(int age)
     {
@@ -158,11 +177,15 @@ public class AdminController : Controller
     }
 
     /// <summary>
-    /// Deletes user.
+    ///     Deletes user.
     /// </summary>
     /// <param name="userName"> UserName. </param>
     /// <param name="isSoft"> Is soft delete. </param>
-    /// <returns> Result. </returns>
+    /// <returns> Nothing or errors. </returns>
+    /// <response code="204"> Success. </response>
+    /// <response code="400"> If something went wrong. </response>
+    /// <response code="401"> If the user if unauthorized. </response>
+    /// <response code="404"> If user not found. </response>
     [HttpDelete("DeleteUser")]
     public async Task<ActionResult> DeleteUser(string userName, bool isSoft)
     {
@@ -176,10 +199,14 @@ public class AdminController : Controller
     }
 
     /// <summary>
-    /// Recovers user.
+    ///     Recovers user.
     /// </summary>
     /// <param name="userName"> UserName. </param>
-    /// <returns> Result. </returns>
+    /// <returns> Nothing or errors. </returns>
+    /// <response code="204"> Success.</response>
+    /// <response code="400"> If something went wrong. </response>
+    /// <response code="401"> If the user if unauthorized. </response>
+    /// <response code="404"> If the user not found. </response>
     [HttpPost("RecoverUser")]
     public async Task<ActionResult> RecoverUser(string userName)
     {

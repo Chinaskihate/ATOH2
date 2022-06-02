@@ -32,6 +32,11 @@ public class UserController : Controller
     /// </summary>
     /// <param name="dto"> UpdateUserDto. </param>
     /// <returns> Result. </returns>
+    /// <response code="204"> Success.</response>
+    /// <response code="400"> If something went wrong. </response>
+    /// <response code="401"> If the user if unauthorized. </response>
+    /// <response code="403"> If the user is revoked. </response>
+    /// <response code="404"> If the user not found. </response>
     [HttpPost("UpdateUser")]
     public async Task<ActionResult> UpdateUser([FromBody] UpdateUserDto dto)
     {
@@ -49,7 +54,12 @@ public class UserController : Controller
     ///     Changes user password.
     /// </summary>
     /// <param name="dto"> Old and new password. </param>
-    /// <returns> Result. </returns>
+    /// <returns> Nothing or errors. </returns>
+    /// <response code="204"> Success.</response>
+    /// <response code="400"> If something went wrong. </response>
+    /// <response code="401"> If the user if unauthorized. </response>
+    /// <response code="403"> If the user is revoked. </response>
+    /// <response code="404"> If the user not found. </response>
     [HttpPost("ChangePassword")]
     public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordByUserDto dto)
     {
@@ -66,7 +76,13 @@ public class UserController : Controller
     ///     Change UserName.
     /// </summary>
     /// <param name="newUserName"> New UserName. </param>
-    /// <returns> New UserName, if it has been changed, otherwise errors. </returns>
+    /// <returns> New UserName or errors. </returns>
+    /// <response code="200"> Success.</response>
+    /// <response code="400"> If something went wrong. </response>
+    /// <response code="401"> If the user if unauthorized. </response>
+    /// <response code="403"> If the user is revoked. </response>
+    /// <response code="404"> If the user not found. </response>
+    /// <response code="409"> If new UserName is already taken. </response>
     [HttpPost("ChangeUserName")]
     public async Task<ActionResult> ChangeUserName(string newUserName)
     {
@@ -83,6 +99,10 @@ public class UserController : Controller
     ///     Get user data.
     /// </summary>
     /// <returns> User data. </returns>
+    /// <response code="200"> Success. </response>
+    /// <response code="400"> If something went wrong. </response>
+    /// <response code="401"> If the user if unauthorized. </response>
+    /// <response code="404"> If the user not found. </response>
     [HttpPost("GetData")]
     public async Task<ActionResult<UserLookupDto>> GetData()
     {
