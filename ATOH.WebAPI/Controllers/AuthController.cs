@@ -37,6 +37,9 @@ public class AuthController : Controller
     /// </summary>
     /// <param name="viewModel"> UserName and password. </param>
     /// <returns> Result. </returns>
+    /// <response code="204"> Success.</response>
+    /// <response code="400"> If something went wrong. </response>
+    /// <response code="404"> If the user not found. </response>
     [HttpPost("Login")]
     [AllowAnonymous]
     public async Task<ActionResult> Login(LoginViewModel viewModel)
@@ -50,7 +53,7 @@ public class AuthController : Controller
         var result = await _signInManager.PasswordSignInAsync(viewModel.UserName, viewModel.Password, false, false);
         if (result.Succeeded)
         {
-            return Ok("ok");
+            return NoContent();
         }
 
         return NotFound("Invalid data.");

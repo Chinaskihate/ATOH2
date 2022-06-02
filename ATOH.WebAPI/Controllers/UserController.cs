@@ -32,7 +32,7 @@ public class UserController : Controller
     /// </summary>
     /// <param name="dto"> UpdateUserDto. </param>
     /// <returns> Result. </returns>
-    /// <response code="204"> Success.</response>
+    /// <response code="204"> Success. </response>
     /// <response code="400"> If something went wrong. </response>
     /// <response code="401"> If the user if unauthorized. </response>
     /// <response code="403"> If the user is revoked. </response>
