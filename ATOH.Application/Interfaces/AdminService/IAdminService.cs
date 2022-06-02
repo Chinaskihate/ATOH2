@@ -22,4 +22,6 @@ public interface IAdminService : IUserUpdater
     Task<UserLookupDto> GetUserData(string userName);
 
     Task<IdentityResult> DeleteUser(string userName, bool isSoft, string revokedBy);
+
+    Task<IdentityResult> RecoverUser(string userName, string modifiedBy);
 }

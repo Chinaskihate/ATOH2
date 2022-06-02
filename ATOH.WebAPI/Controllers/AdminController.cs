@@ -204,18 +204,10 @@ public class AdminController : Controller
     [HttpPost("RecoverUser")]
     public async Task<ActionResult> RecoverUser(string userName)
     {
-        var user = await _userManager.FindByNameAsync(userName);
-        if (user == null)
-        {
-            return NotFound(user);
-        }
-
-        user.RevokedOn = null;
-        user.RevokedBy = null;
-        var result = await _userManager.UpdateAsync(user);
+        var result = await _adminService.RecoverUser(userName, User.Identity!.Name!);
         if (result.Succeeded)
         {
-            return Ok("User has been updated.");
+            return NoContent();
         }
 
         return BadRequest(result.Errors);

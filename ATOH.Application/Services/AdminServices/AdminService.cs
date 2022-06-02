@@ -144,4 +144,22 @@ public class AdminService : IAdminService
 
         return await _userManager.DeleteAsync(user);
     }
+
+    public async Task<IdentityResult> RecoverUser(string userName, string modifiedBy)
+    {
+
+        var user = await _userManager.FindByNameAsync(userName);
+        if (user == null)
+        {
+            throw new UserNotFoundException(userName);
+        }
+
+        user.RevokedOn = null;
+        user.RevokedBy = null;
+        user.ModifiedOn = DateTime.Now;
+        user.ModifiedBy = modifiedBy;
+        var result = await _userManager.UpdateAsync(user);
+
+        return result;
+    }
 }
