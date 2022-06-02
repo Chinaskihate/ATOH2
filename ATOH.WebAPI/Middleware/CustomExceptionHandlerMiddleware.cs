@@ -64,7 +64,7 @@ public class CustomExceptionHandlerMiddleware
         context.Response.StatusCode = (int)code;
         if (string.IsNullOrEmpty(result))
         {
-            result = JsonSerializer.Serialize(new { error = ex.Message });
+            result = JsonSerializer.Serialize(new { errors = new[] { ex.Message }});
         }
 
         return context.Response.WriteAsync(result);

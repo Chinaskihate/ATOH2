@@ -41,6 +41,10 @@ public class UserService : IUserService
     public async Task<IdentityResult> ChangePassword(ChangePasswordByUserDto dto, string userName)
     {
         var user = await _userManager.FindByNameAsync(userName);
+        if (user == null)
+        {
+            throw new UserNotFoundException(userName);
+        }
 
         var result = await _userManager.ChangePasswordAsync(user, dto.OldPassword, dto.NewPassword);
         if (result.Succeeded)

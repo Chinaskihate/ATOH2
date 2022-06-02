@@ -1,17 +1,14 @@
-﻿using ATOH.Application.Interfaces.AdminService;
-using ATOH.Application.Interfaces.UserServices;
+﻿using ATOH.Application.Interfaces.UserServices;
 using ATOH.Application.Users;
 using ATOH.Application.Users.ChangePassword;
 using ATOH.Application.Users.UpdateUser;
-using ATOH.Domain.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ATOH.WebAPI.Controllers;
 
 /// <summary>
-/// Controller for users.
+///     Controller for users.
 /// </summary>
 [ApiController]
 [ApiVersionNeutral]
@@ -22,7 +19,7 @@ public class UserController : Controller
     private readonly IUserService _userService;
 
     /// <summary>
-    /// Constructor.
+    ///     Constructor.
     /// </summary>
     /// <param name="userService"> UserService. </param>
     public UserController(IUserService userService)
@@ -31,7 +28,7 @@ public class UserController : Controller
     }
 
     /// <summary>
-    /// Updates user.
+    ///     Updates user.
     /// </summary>
     /// <param name="dto"> UpdateUserDto. </param>
     /// <returns> Result. </returns>
@@ -49,7 +46,7 @@ public class UserController : Controller
     }
 
     /// <summary>
-    /// Changes user password.
+    ///     Changes user password.
     /// </summary>
     /// <param name="dto"> Old and new password. </param>
     /// <returns> Result. </returns>
@@ -66,7 +63,7 @@ public class UserController : Controller
     }
 
     /// <summary>
-    /// Change UserName.
+    ///     Change UserName.
     /// </summary>
     /// <param name="newUserName"> New UserName. </param>
     /// <returns> New UserName, if it has been changed, otherwise errors. </returns>
@@ -83,7 +80,7 @@ public class UserController : Controller
     }
 
     /// <summary>
-    /// Get user data.
+    ///     Get user data.
     /// </summary>
     /// <returns> User data. </returns>
     [HttpPost("GetData")]
