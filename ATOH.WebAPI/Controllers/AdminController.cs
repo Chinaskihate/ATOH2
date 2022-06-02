@@ -187,21 +187,13 @@ public class AdminController : Controller
     [HttpDelete("DeleteUser")]
     public async Task<ActionResult> DeleteUser(string userName, bool isSoft)
     {
-        var user = await _userManager.FindByNameAsync(userName);
-        if (user == null)
+        var result = await _adminService.DeleteUser(userName, isSoft, User.Identity!.Name!);
+        if (result.Succeeded)
         {
-            return NotFound(user);
+            return NoContent();
         }
 
-        if (isSoft)
-        {
-            user.RevokedOn = DateTime.Now;
-            user.RevokedBy = User.Identity!.Name;
-            var result = await _userManager.UpdateAsync(user);
-            return Ok(result);
-        }
-
-        return Ok(await _userManager.DeleteAsync(user));
+        return BadRequest(result.Errors);
     }
 
     /// <summary>

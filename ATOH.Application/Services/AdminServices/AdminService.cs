@@ -125,4 +125,23 @@ public class AdminService : IAdminService
             .Where(u => (DateTime.Now - u.BirthDay).Value.Days > age * 365)
             .OrderBy(u => u.BirthDay);
     }
+
+    public async Task<IdentityResult> DeleteUser(string userName, bool isSoft, string revokedBy)
+    {
+        var user = await _userManager.FindByNameAsync(userName);
+        if (user == null)
+        {
+            throw new UserNotFoundException(userName);
+        }
+
+        if (isSoft)
+        {
+            user.RevokedOn = DateTime.Now;
+            user.RevokedBy = revokedBy;
+            var result = await _userManager.UpdateAsync(user);
+            return result;
+        }
+
+        return await _userManager.DeleteAsync(user);
+    }
 }
